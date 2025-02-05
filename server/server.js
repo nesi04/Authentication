@@ -12,7 +12,7 @@ const port = process.env.PORT || 4000;
 connectDB(); 
 
 // CORS setup - Allow only specific origins for credentials
-const allowedOrigins = ['http://localhost:5173']; // Allowed origin(s)
+const allowedOrigins = ['https://authentication-c7es.onrender.com']; // Allowed origin(s)
 
 app.use(cors({
   origin: allowedOrigins,       // Allow only specific origins
