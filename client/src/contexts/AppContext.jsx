@@ -4,51 +4,65 @@ import { toast } from "react-toastify";
 
 export const AppContext = createContext();
 
-export const AppContextProvider=(props)=>{
-    const backendUrl = 'https://authentication-server-fp63.onrender.com';
-    const [isLoggedIn,setIsLoggedIn]=useState(false);
-    const [userData,setUserData]=useState(null);
-    axios.defaults.withCredentials=true;
-    const getAuthState = async ()=>{
+export const AppContextProvider = (props) => {
+    const backendUrl = "https://authentication-server-fp63.onrender.com";
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [userData, setUserData] = useState(null);
+
+    axios.defaults.withCredentials = true; // Ensure cookies are sent with requests
+
+    const getAuthState = async () => {
         try {
-            const {data} = await axios.get(backendUrl+'/api/auth/is-auth')
-            if(data.success){
-                setIsLoggedIn(true)
-                getUserData();
+            const { data } = await axios.get(`${backendUrl}/api/auth/is-auth`, {
+                withCredentials: true, // Required to send cookies
+            });
+
+            if (data.success) {
+                setIsLoggedIn(true);
+                getUserData();  // Fetch user data only after successful auth
+            } else {
+                setIsLoggedIn(false);
+                setUserData(null);
             }
         } catch (error) {
-            toast.error(error.message);
+            toast.error(error.response?.data?.message || "Authentication failed");
+            setIsLoggedIn(false);
+            setUserData(null);
         }
-    }
-    
+    };
+
     const getUserData = async () => {
         try {
-          const { data } = await axios.get(`${backendUrl}/api/user/data`, { withCredentials: true });
-          if (data.success) {
-            setUserData(data.userData);  // Ensure userData is set here
-          }
+            const { data } = await axios.get(`${backendUrl}/api/user/data`, {
+                withCredentials: true, // Ensure cookies are included
+            });
+
+            if (data.success) {
+                setUserData(data.userData);
+            } else {
+                setUserData(null);
+            }
         } catch (error) {
-          console.error(error);
+            console.error("Error fetching user data:", error.response?.data?.message || error.message);
+            setUserData(null);
         }
-      };
-    
-      useEffect(() => {
-        getUserData();
-      }, []); 
+    };
 
-      useEffect(()=>{getAuthState()},[]);
-      
-    
+    useEffect(() => {
+        getAuthState();
+    }, []);
+
     const value = {
-       backendUrl,
-       isLoggedIn,setIsLoggedIn,
-       userData,setUserData,
-       getUserData
+        backendUrl,
+        isLoggedIn, setIsLoggedIn,
+        userData, setUserData,
+        getUserData
+    };
 
-    }
-    return( 
+    return (
         <AppContext.Provider value={value}>
             {props.children}
         </AppContext.Provider>
-    )
-}
+    );
+};
+
