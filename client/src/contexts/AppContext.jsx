@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 export const AppContext = createContext();
 
 export const AppContextProvider=(props)=>{
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    const backendUrl = 'https://authentication-server-fp63.onrender.com';
     const [isLoggedIn,setIsLoggedIn]=useState(false);
     const [userData,setUserData]=useState(null);
     axios.defaults.withCredentials=true;
